@@ -1,8 +1,3 @@
-/* 
-  動作はしますが、ゲーム判定部が動作不良を起こします。
-  具体的には WIN LOSE OK NG は判定しますが、NOは判定してくれませんでした。
-*/
-
 package pgcon;
 
 import java.util.Scanner;
@@ -15,15 +10,10 @@ public class Q2 {
 
 		//マルバツゲームフィールドデータの取得
 		String[] tictacData = new String[3];//行数確保
-		int i = 0;
-		try{
-			while(i < 3){
-				tictacData[i] = sc.nextLine();
-				i++;
-			}
-		} finally{
-			sc.close();
+		for(int i = 0; i < 3; i++){ // while(i < 3){
+			tictacData[i] = sc.nextLine();
 		}
+		sc.close();
 
 		//マルバツゲームフィールドデータの展開
 		String tictacField[][] = new String[3][3];
@@ -46,7 +36,7 @@ public class Q2 {
 		//○と×の数計測(進行手番判定用)
 		int tic = 0; // ○の数
 		int tac = 0; // ×の数
-		for(i = 0; i < 3; i++){
+		for(int i = 0; i < 3; i++){
 			for(int j = 0; j < 3; j++){
 				if(tictacField[i][j].equals("o")){
 					tic += 1;
@@ -62,20 +52,11 @@ public class Q2 {
 		int ticLine[] = new int[3];
 		int ticStraight[] = new int[3];
 		int ticSland[] = new int[2];
-		int ticNextLineWin = 0;
-		int ticNextStraightWin = 0;
-		int ticNextSlandWin = 0;
-		for(i = 0; i < 3; i++){
-			ticLine[i] = 0;
-			ticStraight[i] = 0;
-		}
-		ticSland[0] = 0;
-		ticSland[1] = 0;
-
 
 
 		// 判定開始(列)
-		for(i = 0; i < 3; i++){
+		for(int i = 0; i < 3; i++){
+			nextWinTic = 0;
 			for(int j = 0; j < 3; j++){
 				if(tictacField[i][j].equals("o")){
 					nextWinTic += 1;
@@ -84,12 +65,12 @@ public class Q2 {
 				}
 			}
 			ticStraight[i] = nextWinTic;
-			nextWinTic = 0;
 		}
 
 		nextWinTic = 0;
 		// 判定開始(行)
-		for(i = 0; i < 3; i++){
+		for(int i = 0; i < 3; i++){
+			nextWinTic = 0;
 			for(int j = 0; j < 3; j++){
 				if(tictacField[j][i].equals("o")){
 					nextWinTic += 1;
@@ -98,7 +79,6 @@ public class Q2 {
 				}
 			}
 			ticLine[i] = nextWinTic;
-			nextWinTic = 0;
 		}
 
 		if(tictacField[0][0].equals("o")){
@@ -129,31 +109,24 @@ public class Q2 {
 			ticSland[1] -= 1;
 		}
 
-//		for(i = 0; i < 3; i++){
-//			System.out.println("ticStraight[" + i + "]：" + ticStraight[i]);
-//			System.out.println("ticLine[" + i + "]：" + ticLine[i]);
-//		}
-//		for(i = 0; i < 2; i++){
-//			System.out.println("ticSland[" + i + "]：" + ticSland[i]);
-//		}
-
-
-
-		for(i = 0; i < 3; i++){
+		int ticNextWin = 0;
+		for(int i = 0; i < 3; i++){
 			if(ticLine[i] == 2){
-				ticNextLineWin = 2;
+				ticNextWin = 2;
+				break;
 			}
 			if(ticStraight[i] == 2){
-				ticNextStraightWin = 2;
+				ticNextWin = 2;
+				break;
 			}
 		}
-		if( (ticSland[0] == 2) || (ticSland[1] == 2) ){
-			ticNextSlandWin = 2;
+		if((ticNextWin != 2) && (ticSland[0] == 2) || (ticSland[1] == 2) ){
+			ticNextWin = 2;
 		}
 
 		int blankCnt = 0;
 		//盤面が全て埋まっているか判定
-		for(i = 0; i < 3; i++){
+		for(int i = 0; i < 3; i++){
 			for(int j = 0; j < 3; j++){
 				if(tictacField[i][j].equals("-")){
 					blankCnt += 1;
@@ -161,72 +134,63 @@ public class Q2 {
 			}
 		}
 
-		int rowCnt_o = 0; //行判定
-		int rowCnt_x = 0; //行判定
-		int colCnt_o = 0; //列判定
-		int colCnt_x = 0; //列判定
-		int slaCnt_o = 0; //斜め判定
-		int slaCnt_x = 0; //斜め判定
+		int ticCnt = 0; //勝利判定
+		int tacCnt = 0; //敗北判定
 
 		//盤面が全て埋まっている
 		if(blankCnt < 9){
 			//行単位の勝利判定
-			for(i = 0; i<3; i++){
-				if(tictacField[i][0].equals("o") && tictacField[i][1].equals("o") && tictacField[i][2].equals("o")){
-					rowCnt_o += 1;
-				}else if(tictacField[i][0].equals("x") && tictacField[i][1].equals("x") && tictacField[i][2].equals("x")){
-					rowCnt_x += 1;
+			for(int i = 0; i<3; i++){
+				if(ticLine[i] == 3){
+					ticCnt++;
+				}else if(ticLine[i] == -3){
+					tacCnt++;
 				}
 			}
 
 			//列単位の勝利判定
-			for(i = 0; i<3; i++){
-				if(tictacField[0][i].equals("o") && tictacField[1][i].equals("o") && tictacField[2][i].equals("o")){
-					colCnt_o += 1;
-				}else if(tictacField[0][i].equals("x") && tictacField[1][i].equals("x") && tictacField[2][i].equals("x")){
-					colCnt_x += 1;
+			for(int i = 0; i<3; i++){
+				if(ticStraight[i] == 3){
+					ticCnt++;
+				}else if(ticStraight[i] == -3){
+					tacCnt++;
 				}
 			}
 
 			//斜め単位の勝利判定
-			if(tictacField[0][0].equals("o") && tictacField[1][1].equals("o") && tictacField[2][2].equals("o")){
-				slaCnt_o += 1;
-			}else if(tictacField[0][0].equals("x") && tictacField[1][1].equals("x") && tictacField[2][2].equals("x")){
-				slaCnt_x += 1;
+			for(int i = 0; i < 2; i++){
+				if(ticSland[i] == 3){
+					ticCnt++;
+				}else if(ticSland[i] == -3){
+					tacCnt++;
+				}
 			}
-
-			if(tictacField[0][2].equals("o") && tictacField[1][1].equals("o") && tictacField[2][0].equals("o")){
-				slaCnt_o += 1;
-			}else if(tictacField[0][2].equals("x") && tictacField[1][1].equals("x") && tictacField[2][0].equals("x")){
-				slaCnt_x += 1;
-			}
-
 
 			//総合判定
 			if(blankCnt == 0){ // 盤面が全て『埋まっている』場合
-				if(rowCnt_o == 0 && colCnt_o == 0 && slaCnt_o == 0 && rowCnt_x == 0 && colCnt_x == 0 && slaCnt_x == 0){
+				if((ticCnt == 0) && (tacCnt == 0)){
 					answer = "FIN";
-				}else if(rowCnt_o != 0 || colCnt_o != 0 || slaCnt_o != 0){
+				}else if(ticCnt != 0){
 					answer = "WIN";
-				}else if(rowCnt_x != 0 || colCnt_x != 0 || slaCnt_x != 0){
+				}else if(tacCnt != 0){
 					answer = "LOSE";
-				}else if( (tic > tac) || (tac == 0 && tic == 1)){
+				}else if(tic > tac){
 					answer = "NG";
-				}else if( (tac >= tic) && (ticNextLineWin == 2 || ticNextStraightWin == 2 || ticNextSlandWin == 2)){
+				}else if(ticNextWin == 2){
 					answer = "OK";
-				}else if( (tac >= tic) && (ticNextLineWin != 2 || ticNextStraightWin != 2 || ticNextSlandWin != 2)){
+				}else{
 					answer = "NO";
 				}
 			}else { // 盤面が『埋まり切っていない』場合
-				if(rowCnt_o != 0 || colCnt_o != 0 || slaCnt_o != 0){
+				if(ticCnt != 0){
 					answer = "WIN";
-				}else if(rowCnt_x != 0 || colCnt_x != 0 || slaCnt_x != 0){
+				}else if(tacCnt != 0){
 					answer = "LOSE";
-				}else if(tic > tac || (tac == 0 && tic == 1)){
+				}else if(tic > tac){
 					answer = "NG";
-				}else if( (tac >= tic) && (ticNextLineWin == 2 || ticNextStraightWin == 2 || ticNextSlandWin == 2)){
+				}else if(ticNextWin == 2){
 					answer = "OK";
-				}else if( (tac >= tic) && (ticNextLineWin != 2 || ticNextStraightWin != 2 || ticNextSlandWin != 2)){
+				}else{
 					answer = "NO";
 				}
 			}
